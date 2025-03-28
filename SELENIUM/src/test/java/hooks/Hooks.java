@@ -1,30 +1,6 @@
-package hooks;
+ChromeOptions options = new ChromeOptions();
+options.addArguments("--headless"); // Menjalankan tanpa GUI
+options.addArguments("--disable-gpu"); // Opsional, untuk beberapa sistem operasi
+options.addArguments("--window-size=1920,1080"); // Opsional, agar resolusi tetap stabil
 
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-
-public class Hooks {
-    private static WebDriver driver;
-    private static final String BASE_URL = "https://www.saucedemo.com/";
-
-    @Before
-    public void setUp (){
-        System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
-        driver.get(BASE_URL);
-    }
-
-    @After
-    public void tearDown (){
-        if (driver != null){
-            driver.quit();
-        }
-    }
-
-    public static WebDriver getDriver(){
-        return driver;
-    }
-}
+driver = new ChromeDriver(options);
