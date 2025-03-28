@@ -1,0 +1,60 @@
+name: Selenium UI Testing
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  selenium-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y google-chrome-stable jq
+
+      - name: Verify Chrome Version
+        run: google-chrome --version
+
+      - name: Set Up ChromeDriver (Chrome for Testing)
+        run: |
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
+          echo "Detected Chrome version: $CHROME_VERSION"
+
+          # Dapatkan URL ChromeDriver yang sesuai
+          DRIVER_URL=$(curl -sS https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json | \
+            jq -r '.versions[] | select(.version=="'"$CHROME_VERSION"'") | .downloads.chromedriver[] | select(.platform=="linux64") | .url')
+
+          if [ -z "$DRIVER_URL" ]; then
+            echo "No matching ChromeDriver found for Chrome version $CHROME_VERSION"
+            exit 1
+          fi
+
+          echo "Downloading ChromeDriver from: $DRIVER_URL"
+          wget -N "$DRIVER_URL" -O chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+
+          # Perbaikan: Akses file dari folder yang benar
+          chmod +x chromedriver-linux64/chromedriver
+          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
+          chromedriver --version
+
+      - name: Build and Run Tests
+        working-directory: SELENIUM
+        run: mvn clean test
+ 
