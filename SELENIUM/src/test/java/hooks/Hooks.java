@@ -15,9 +15,7 @@ public class Hooks {
         System.setProperty("webdriver.chrome.driver", "/usr/local/bin/chromedriver");
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // Jalankan tanpa GUI
-        options.addArguments("--disable-gpu"); // Opsional
-        options.addArguments("--window-size=1920,1080"); // Opsional
+        options.addArguments("--headless"); 
 
         driver = new ChromeDriver(options);
         driver.manage().window().maximize();
